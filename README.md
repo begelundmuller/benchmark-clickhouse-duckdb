@@ -1,4 +1,4 @@
-# Local OLAP benchmarks
+# Clickhouse vs. DuckDB benchmarks on local
 
 This project benchmarks two simple queries against ~1.2GB of Parquet data in Clickhouse and DuckDB. It imports the data into each datastore and runs the benchmarks as native queries. It runs all benchmark iterations in the same session and does not reset caches.
 
