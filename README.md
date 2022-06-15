@@ -6,6 +6,15 @@ Warning: I put the benchmark together pretty quickly, it hasn't been code review
 
 ## Results
 
+**Benchmarks:**
+
+```
+duckdb:groupby:         avg=4.575s min=4.527s max=4.717s (10 runs)
+clickhouse:groupby:     avg=0.729s min=0.707s max=0.784s (10 runs)
+duckdb:self-join:       avg=1.741s min=1.646s max=1.832s (10 runs)
+clickhouse:self-join:   avg=0.711s min=0.698s max=0.737s (10 runs)
+```
+
 **Disk usage:**
 
 ```
@@ -14,13 +23,11 @@ Clickhouse: 2.2G
 DuckDB: 7.1G
 ```
 
-**Benchmarks:**
+**Executable binary size:**
 
 ```
-duckdb:groupby:         avg=4.575s min=4.527s max=4.717s (10 runs)
-clickhouse:groupby:     avg=0.729s min=0.707s max=0.784s (10 runs)
-duckdb:self-join:       avg=1.741s min=1.646s max=1.832s (10 runs)
-clickhouse:self-join:   avg=0.711s min=0.698s max=0.737s (10 runs)
+Clickhouse: 363M
+DuckDB: 37M
 ```
 
 ## Setup
@@ -88,4 +95,11 @@ poetry run python benchmark.py
 echo "Raw parquet:" && du -hs data
 echo "Clickhouse:" && du -hs clickhouse/store
 echo "DuckDB:" && du -hs duckdb/db.duckdb
+```
+
+8. Compute executable size
+
+```
+echo "Clickhouse:" && du -hs clickhouse/clickhouse
+echo "DuckDB:" && du -hs duckdb/duckdb
 ```
