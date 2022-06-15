@@ -15,6 +15,16 @@ duckdb:self-join:       avg=1.741s min=1.646s max=1.832s (10 runs)
 clickhouse:self-join:   avg=0.711s min=0.698s max=0.737s (10 runs)
 ```
 
+<!--
+Modifying the queries to run directly on Parquet files:
+```
+duckdb:groupby:     avg=6.235s min=5.890s max=6.466s (10 runs)
+clickhouse:groupby: avg=10.437s min=9.150s max=11.665s (10 runs)
+duckdb:self-join:   avg=3.359s min=2.847s max=4.069s (10 runs)
+clickhouse:self-join: avg=9.691s min=9.217s max=10.460s (10 runs)
+```
+-->
+
 **Disk usage:**
 
 ```
