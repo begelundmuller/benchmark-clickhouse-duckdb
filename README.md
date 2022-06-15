@@ -56,7 +56,6 @@ curl https://clickhouse.com/ | sh
 3. In a new tab, import data into Clickhouse:
 
 ```shell
-cd ..
 ./clickhouse/clickhouse client --queries-file clickhouse_create_trips.sql
 ./clickhouse/clickhouse client --max_memory_usage 0 --query='INSERT INTO trips FORMAT Parquet' < data/fhvhv_tripdata_2022-01.parquet
 ./clickhouse/clickhouse client --max_memory_usage 0 --query='INSERT INTO trips FORMAT Parquet' < data/fhvhv_tripdata_2022-02.parquet
