@@ -1,8 +1,8 @@
 # Clickhouse vs. DuckDB benchmarks on local
 
-This project benchmarks two simple queries against ~1.2GB of Parquet data in Clickhouse and DuckDB. It imports the data into each datastore and runs the benchmarks as native queries. It runs all benchmark iterations in the same session and does not reset caches.
+This project benchmarks two simple queries against Clickhouse and DuckDB. It imports ~1.2GB of Parquet data into each datastore and runs the benchmarks as native queries. It runs all benchmark iterations in the same session and does not reset caches.
 
-Warning: I put the benchmark together pretty quickly, it hasn't been code reviewed, it only covers two queries, and I ran it all on my local.
+_Warning: This is far from a rigorous benchmark._
 
 ## Results
 
@@ -16,33 +16,38 @@ clickhouse:self-join:   avg=0.711s min=0.698s max=0.737s (10 runs)
 ```
 
 <!--
-Modifying the queries to run directly on Parquet files:
+Hacking the queries to run directly on the Parquet files (uses the Clickhouse File Table engine):
+
 ```
-duckdb:groupby:     avg=6.235s min=5.890s max=6.466s (10 runs)
-clickhouse:groupby: avg=10.437s min=9.150s max=11.665s (10 runs)
-duckdb:self-join:   avg=3.359s min=2.847s max=4.069s (10 runs)
-clickhouse:self-join: avg=9.691s min=9.217s max=10.460s (10 runs)
+duckdb:groupby:         avg=6.235s min=5.890s max=6.466s (10 runs)
+clickhouse:groupby:     avg=10.437s min=9.150s max=11.665s (10 runs)
+duckdb:self-join:       avg=3.359s min=2.847s max=4.069s (10 runs)
+clickhouse:self-join:   avg=9.691s min=9.217s max=10.460s (10 runs)
 ```
 -->
+
+Executed on a Macbook Pro (2018) with 2.2 GHz 6-Core Intel Core i7 and 16 GB memory.
 
 **Disk usage:**
 
 ```
-Raw parquet: 1.2G
+Parquet:    1.2G
 Clickhouse: 2.2G
-DuckDB: 7.1G
+DuckDB:     7.1G
 ```
 
 **Executable binary size:**
 
 ```
 Clickhouse: 363M
-DuckDB: 37M
+DuckDB:     37M
 ```
 
-## Setup
+## Instructions
 
-1. Download data (~1GB of [NYC taxi data](https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page))
+1. Clone this repo and `cd` into it
+
+2. Download data (~1.2GB of [NYC taxi data](https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page))
 
 ```shell
 mkdir -p data
@@ -54,7 +59,7 @@ curl -O https://nyc-tlc.s3.amazonaws.com/trip+data/fhvhv_tripdata_2022-03.parque
 cd ..
 ```
 
-2. Install and run Clickhouse ([source](https://clickhouse.com/docs/en/quick-start)):
+3. Install and run Clickhouse ([source](https://clickhouse.com/docs/en/quick-start)):
 
 ```shell
 mkdir -p clickhouse
@@ -63,7 +68,7 @@ curl https://clickhouse.com/ | sh
 ./clickhouse server
 ```
 
-3. In a new tab, import data into Clickhouse:
+4. In a new terminal, import data into Clickhouse:
 
 ```shell
 ./clickhouse/clickhouse client --queries-file clickhouse_create_trips.sql
@@ -72,18 +77,18 @@ curl https://clickhouse.com/ | sh
 ./clickhouse/clickhouse client --max_memory_usage 0 --query='INSERT INTO trips FORMAT Parquet' < data/fhvhv_tripdata_2022-03.parquet
 ```
 
-4. Install DuckDB:
+5. Install DuckDB:
 
 ```shell
 mkdir -p duckdb
 cd duckdb
-# For Intel Mac. For ARM and Linux, see: https://duckdb.org/docs/installation/index
+# Works on Intel Macs (for ARM and Linux, see: https://duckdb.org/docs/installation/index)
 curl -O -L https://github.com/duckdb/duckdb/releases/download/v0.3.2/duckdb_cli-osx-amd64.zip
 unzip duckdb_cli-osx-amd64.zip
 cd ..
 ```
 
-5. Insert data into DuckDB:
+6. Insert data into DuckDB:
 
 ```shell
 ./duckdb/duckdb ./duckdb/db.duckdb -c "CREATE TABLE trips AS SELECT * FROM read_parquet('data/fhvhv_tripdata_2022-01.parquet')"
@@ -91,22 +96,22 @@ cd ..
 ./duckdb/duckdb ./duckdb/db.duckdb -c "INSERT INTO trips SELECT * FROM read_parquet('data/fhvhv_tripdata_2022-03.parquet')"
 ```
 
-6. Run the benchmark
+7. Run the benchmark (requires [Poetry](https://python-poetry.org/docs/#installation)):
 
 ```shell
 poetry install
 poetry run python benchmark.py
 ```
 
-7. Compute data size on disk
+8. Compute data size on disk:
 
 ```
-echo "Raw parquet:" && du -hs data
+echo "Parquet:" && du -hs data
 echo "Clickhouse:" && du -hs clickhouse/store
 echo "DuckDB:" && du -hs duckdb/db.duckdb
 ```
 
-8. Compute executable size
+9. Compute executable size:
 
 ```
 echo "Clickhouse:" && du -hs clickhouse/clickhouse
