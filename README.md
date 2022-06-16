@@ -9,10 +9,10 @@ _Warning: This is far from a rigorous benchmark._
 **Benchmarks:**
 
 ```
-duckdb:groupby:         avg=4.575s min=4.527s max=4.717s (10 runs)
-clickhouse:groupby:     avg=0.729s min=0.707s max=0.784s (10 runs)
-duckdb:self-join:       avg=1.741s min=1.646s max=1.832s (10 runs)
-clickhouse:self-join:   avg=0.711s min=0.698s max=0.737s (10 runs)
+duckdb:groupby:         avg=1.390s min=1.301s max=1.543s (10 runs)
+clickhouse:groupby:     avg=0.805s min=0.705s max=1.059s (10 runs)
+duckdb:self-join:       avg=0.635s min=0.616s max=0.743s (10 runs)
+clickhouse:self-join:   avg=0.701s min=0.660s max=0.743s (10 runs)
 ```
 
 <!--
