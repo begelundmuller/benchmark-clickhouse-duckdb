@@ -7,7 +7,7 @@ authors = ["Benjamin Egelund-Müller <benjamin.egelundmuller@rilldata.com>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 clickhouse-driver = "^0.2.4"
-duckdb = "0.3.2"
+duckdb = "0.6.1"
 
 [tool.poetry.dev-dependencies]
 

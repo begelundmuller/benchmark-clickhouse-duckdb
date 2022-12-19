@@ -4,7 +4,7 @@ with
         toYYYYMMDD(dropoff_datetime) as day,
         sum(base_passenger_fare) as base_fare
         from trips
-        group by toYYYYMMDD(dropoff_datetime)
+        group by day
     ),
     daily_trips_by_location as (
         select
@@ -12,7 +12,7 @@ with
         DOLocationID as location,
         sum(base_passenger_fare) as base_fare
         from trips
-        group by toYYYYMMDD(dropoff_datetime), DOLocationID
+        group by day, location
     )
 select d.day, count(*)
 from daily_trips d

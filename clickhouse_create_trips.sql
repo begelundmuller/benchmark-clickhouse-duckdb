@@ -25,5 +25,6 @@ CREATE TABLE trips (
     wav_match_flag Nullable(String)
 )
 ENGINE = MergeTree
-PARTITION BY toYYYYMMDD(pickup_datetime)
-ORDER BY pickup_datetime;
+ORDER BY (trip_miles, request_datetime, dropoff_datetime)
+PARTITION BY toMonth(request_datetime)
+SETTINGS allow_nullable_key = 1;
