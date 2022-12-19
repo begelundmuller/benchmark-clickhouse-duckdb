@@ -9,10 +9,10 @@ _Warning: This is far from a rigorous benchmark._
 **Benchmarks:**
 
 ```
-duckdb:groupby:         avg=1.390s min=1.301s max=1.543s (10 runs)
-clickhouse:groupby:     avg=0.805s min=0.705s max=1.059s (10 runs)
-duckdb:self-join:       avg=0.635s min=0.616s max=0.743s (10 runs)
-clickhouse:self-join:   avg=0.701s min=0.660s max=0.743s (10 runs)
+duckdb:groupby:       avg=2.120s min=1.977s max=3.252s (10 runs)
+clickhouse:groupby:   avg=0.763s min=0.737s max=0.821s (10 runs)
+duckdb:self-join:     avg=2.413s min=2.392s max=2.541s (10 runs)
+clickhouse:self-join: avg=1.591s min=1.575s max=1.698s (10 runs)
 ```
 
 <!--
@@ -31,31 +31,29 @@ Executed on a Macbook Pro (2018) with 2.2 GHz 6-Core Intel Core i7 and 16 GB mem
 **Disk usage:**
 
 ```
-Parquet:    1.2G
-Clickhouse: 2.2G
-DuckDB:     7.1G
+Parquet:    8.1G
+Clickhouse: 14.9G
+DuckDB:     17.4G
 ```
 
 **Executable binary size:**
 
 ```
-Clickhouse: 363M
-DuckDB:     37M
+Clickhouse: 422.7M
+DuckDB:     78.3M
 ```
 
 ## Instructions
 
 1. Clone this repo and `cd` into it
 
-2. Download data (~1.2GB of [NYC taxi data](https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page))
+2. Download `High Volume For-Hire Vehicle Trip Records` dataset for the year of 2021 and 2022 (~8.1GB of [NYC taxi data](https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page))
 
 ```shell
 mkdir -p data
 cd data
 curl https://s3.amazonaws.com/nyc-tlc/misc/taxi+_zone_lookup.csv -o taxi_zone_lookup.csv
-curl -O https://nyc-tlc.s3.amazonaws.com/trip+data/fhvhv_tripdata_2022-01.parquet
-curl -O https://nyc-tlc.s3.amazonaws.com/trip+data/fhvhv_tripdata_2022-02.parquet
-curl -O https://nyc-tlc.s3.amazonaws.com/trip+data/fhvhv_tripdata_2022-03.parquet
+for year in {2020..2021}; do for month in {01..12}; do wget https://nyc-tlc.s3.amazonaws.com/trip+data/fhvhv_tripdata_${year}-${month}.parquet; done; done;
 cd ..
 ```
 
@@ -72,9 +70,7 @@ curl https://clickhouse.com/ | sh
 
 ```shell
 ./clickhouse/clickhouse client --queries-file clickhouse_create_trips.sql
-./clickhouse/clickhouse client --max_memory_usage 0 --query='INSERT INTO trips FORMAT Parquet' < data/fhvhv_tripdata_2022-01.parquet
-./clickhouse/clickhouse client --max_memory_usage 0 --query='INSERT INTO trips FORMAT Parquet' < data/fhvhv_tripdata_2022-02.parquet
-./clickhouse/clickhouse client --max_memory_usage 0 --query='INSERT INTO trips FORMAT Parquet' < data/fhvhv_tripdata_2022-03.parquet
+./clickhouse/clickhouse client --max_memory_usage 0 --query='INSERT INTO trips FORMAT Parquet' < data/fhvhv_tripdata_*.parquet
 ```
 
 5. Install DuckDB:
@@ -83,7 +79,7 @@ curl https://clickhouse.com/ | sh
 mkdir -p duckdb
 cd duckdb
 # Works on Intel Macs (for ARM and Linux, see: https://duckdb.org/docs/installation/index)
-curl -O -L https://github.com/duckdb/duckdb/releases/download/v0.3.2/duckdb_cli-osx-amd64.zip
+curl -O -L https://github.com/duckdb/duckdb/releases/download/v0.6.1/duckdb_cli-osx-universal.zip
 unzip duckdb_cli-osx-amd64.zip
 cd ..
 ```
@@ -91,9 +87,7 @@ cd ..
 6. Insert data into DuckDB:
 
 ```shell
-./duckdb/duckdb ./duckdb/db.duckdb -c "CREATE TABLE trips AS SELECT * FROM read_parquet('data/fhvhv_tripdata_2022-01.parquet')"
-./duckdb/duckdb ./duckdb/db.duckdb -c "INSERT INTO trips SELECT * FROM read_parquet('data/fhvhv_tripdata_2022-02.parquet')"
-./duckdb/duckdb ./duckdb/db.duckdb -c "INSERT INTO trips SELECT * FROM read_parquet('data/fhvhv_tripdata_2022-03.parquet')"
+./duckdb/duckdb ./duckdb/db.duckdb -c "CREATE TABLE trips AS SELECT * FROM read_parquet('data/fhvhv_tripdata_*.parquet')"
 ```
 
 7. Run the benchmark (requires [Poetry](https://python-poetry.org/docs/#installation)):
